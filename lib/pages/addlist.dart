@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +36,7 @@ class _AddTaskState extends State<AddTask> {
             maxLines: 10,
           ),
           const SizedBox(height: 10),
-          ElevatedButton(onPressed: () {}, child: const Text("Submit"))
+          ElevatedButton(onPressed: submitData, child: const Text("Submit"))
         ],
       ),
     );
@@ -52,12 +53,27 @@ class _AddTaskState extends State<AddTask> {
     };
 
     //submit data to the server
-    final url = 'https://api.nstack.in.v1/todos';
+    const url = 'https://api.nstack.in/v1/todos';
     final uri = Uri.parse(url);
-    final response = await http.post(uri, body: jsonDecode(body.toString()));
+    final response = await http.post(
+      uri,
+      body: jsonEncode(body), // Correction ici
+      headers: {"Content-Type": "application/json"},
+    );
 
     //show message success or fail based on status
-    print(response.statusCode);
-    print(response.body);
+    response.statusCode == 201
+        ? showSuccessMessage("Tache ajouté avec success")
+        : showErrorMessage("Erreur lors de l'ajoout");
+  }
+
+  void showSuccessMessage(String message) {
+    final snackbar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void showErrorMessage(String message) {
+    final snackbar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 }
