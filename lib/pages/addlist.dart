@@ -73,7 +73,13 @@ class _AddTaskState extends State<AddTask> {
   }
 
   void showErrorMessage(String message) {
-    final snackbar = SnackBar(content: Text(message));
+    final snackbar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red,
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 }
