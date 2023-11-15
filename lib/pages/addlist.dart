@@ -62,9 +62,13 @@ class _AddTaskState extends State<AddTask> {
     );
 
     //show message success or fail based on status
-    response.statusCode == 201
-        ? showSuccessMessage("Tache ajouté avec success")
-        : showErrorMessage("Erreur lors de l'ajoout");
+    if (response.statusCode == 201) {
+      showSuccessMessage("Tache ajouté avec success");
+      titleController.text = "";
+      descriptionController.text = "";
+    } else {
+      showErrorMessage("Erreur lors de l'ajoout");
+    }
   }
 
   void showSuccessMessage(String message) {
