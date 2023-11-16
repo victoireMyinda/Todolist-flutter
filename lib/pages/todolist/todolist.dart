@@ -12,6 +12,7 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
+  bool isLoading = true;
   List items = [];
 
   @override
@@ -27,20 +28,30 @@ class _TodoListState extends State<TodoList> {
       appBar: AppBar(
         title: const Text("Todo List"),
       ),
-      body: RefreshIndicator(
-        onRefresh: getAllTAsk,
-        child: ListView.builder(
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              final item = items[index] as Map;
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Text('${index + 1}'),
-                ),
-                title: Text(item['title']),
-                subtitle: Text(item['description']),
-              );
-            }),
+      body: Visibility(
+        visible: isLoading,
+        child: Center(child: CircularProgressIndicator()),
+        replacement: RefreshIndicator(
+          onRefresh: getAllTAsk,
+          child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index] as Map;
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Text('${index + 1}'),
+                  ),
+                  title: Text(item['title']),
+                  subtitle: Text(item['description']),
+                  trailing: PopupMenuButton(itemBuilder: (context) {
+                    return [
+                      const PopupMenuItem(child: Text('Edit')),
+                      const PopupMenuItem(child: Text('Delete')),
+                    ];
+                  }),
+                );
+              }),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: navigateToAddPage,
@@ -69,6 +80,9 @@ class _TodoListState extends State<TodoList> {
       setState(() {
         items = result;
       });
-    } else {}
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 }
