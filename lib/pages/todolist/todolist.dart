@@ -37,16 +37,28 @@ class _TodoListState extends State<TodoList> {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 final item = items[index] as Map;
+                final id = item['_id'] as String;
                 return ListTile(
                   leading: CircleAvatar(
                     child: Text('${index + 1}'),
                   ),
                   title: Text(item['title']),
                   subtitle: Text(item['description']),
-                  trailing: PopupMenuButton(itemBuilder: (context) {
+                  trailing: PopupMenuButton(onSelected: (value) {
+                    if (value == 'edit') {
+                    } else if (value == 'delete') {
+                      deleteById(id);
+                    }
+                  }, itemBuilder: (context) {
                     return [
-                      const PopupMenuItem(child: Text('Edit')),
-                      const PopupMenuItem(child: Text('Delete')),
+                      const PopupMenuItem(
+                        child: Text('Edit'),
+                        value: 'edit',
+                      ),
+                      const PopupMenuItem(
+                        child: Text('Delete'),
+                        value: 'delete',
+                      ),
                     ];
                   }),
                 );
@@ -84,5 +96,41 @@ class _TodoListState extends State<TodoList> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> deleteById(String id) async {
+    //get the date=a from form
+
+    //submit data to the server
+    final url = 'https://api.nstack.in/v1/todos/$id';
+    final uri = Uri.parse(url);
+    final response = await http.delete(uri);
+
+    //show message success or fail based on status
+    if (response.statusCode == 200) {
+      final filtered = items.where((element) => element['_id'] != id).toList();
+      setState(() {
+        items = filtered;
+      });
+      showSuccessMessage('Tache $id supprimée avec success');
+    } else {
+      showErrorMessage('Erreur lors de de supression de la tache $id');
+    }
+  }
+
+  void showSuccessMessage(String message) {
+    final snackbar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
+  void showErrorMessage(String message) {
+    final snackbar = SnackBar(
+      content: Text(
+        message,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 }
