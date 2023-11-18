@@ -73,17 +73,22 @@ class _TodoListState extends State<TodoList> {
     );
   }
 
-  void navigateToAddPage() {
+  Future<void> navigateToAddPage() async {
     final route = MaterialPageRoute(
       builder: (context) => const AddTask(),
     );
 
     Navigator.push(context, route);
+    setState(() {
+      isLoading = true;
+    });
+
+    getAllTAsk();
   }
 
-  void navigateToEditPage() {
+  void navigateToEditPage(Map item) {
     final route = MaterialPageRoute(
-      builder: (context) => const AddTask(),
+      builder: (context) => AddTask(todo: item),
     );
 
     Navigator.push(context, route);
